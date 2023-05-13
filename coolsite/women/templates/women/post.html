@@ -1,0 +1,82 @@
+{% extends 'women/base.html' %}
+{% load static %}
+{% block content %}
+
+<button class="edit">Редактировать статью</button>
+<button class="cancellation">Отмена</button>
+
+<div class="articlefull">
+<h1>{{post.title}}</h1>
+
+
+{% if post.photo %}
+<p><img class="img-article-left" src="{{post.photo.url}}"></p>
+{% endif %}
+
+{{post.content|linebreaks}}
+
+<div>Комментарии</div>
+    <h5></h5>
+
+<div class='comments'>
+{% for c in page_obj_ %}
+    <div class="back-com">{{c.name}}:<p>Время создания: {{c.time_create}}</p><p>{{c|linebreaks}}</p></div>
+{% endfor %}
+</div>
+
+{% if request.user.is_authenticated %}
+<form action="{% url 'post' post_slug %}" method="POST" id="comment_form">
+    {% csrf_token %}
+    <div class="form-error">{{form.non_field_errors}}</div>
+    {% for f in form %}
+    <p><label class="form-label" for="{{f.id_for_label}}">{{f.label}}:</label>{{f}}</p>
+    <div class="form-error">{{f.errors}}</div>
+    {% endfor %}
+
+    <button type="submit" name="add_comment" class="add_com">Добавить</button>
+</form>
+<div class="emoji"></div>
+{% else %}
+<p>войдите для взаимодействия</p>
+{% endif %}
+
+</div>
+
+<div class="edit_article">
+    <form action="{% url 'post' post_slug %}" method="POST" enctype="multipart/form-data">
+    {% csrf_token %}
+    <div class="form-error">{{form.non_field_errors}}</div>
+    {% for f in form_edit %}
+    <p><label class="form-label" for="{{f.id_for_label}}">{{f.label}}:</label>{{f}}</p>
+    <div class='form-error'>{{ f.errors }}</div>
+        {% endfor %}
+
+    <button type="submit" name="edit_form" class="edit_form">Редактировать</button>
+</form>
+</div>
+
+<div class="pag">
+{% if page_obj_.has_other_pages %}
+
+<nav class="list-pages">
+    <ul>
+    {% if page_obj_.has_previous %}
+        <li class="page-num">
+            <a href="?page={{page_obj.number}}&cat_page={{page_obj_cats.number}}&comment_page={{page_obj_.previous_page_number}}">&lt;</a>
+        </li>
+    {% endif %}
+    {% if page_obj_.has_next %}
+        <li class="page-num">
+            <a href="?page={{page_obj.number}}&cat_page={{page_obj_cats.number}}&comment_page={{page_obj_.next_page_number}}">&gt;</a>
+        </li>
+    {% endif %}
+    </ul>
+</nav>
+{% endif %}
+
+</div>
+
+<!--<button class="get_1">GET</button>-->
+<!--<div class='ddd'></div>-->
+
+{% endblock %}
